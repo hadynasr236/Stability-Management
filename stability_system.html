@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stability Management System - QC Pro</title>
+    <style>
+        :root {
+            --primary: #0f172a;
+            --secondary: #0284c7;
+            --accent: #059669;
+            --bg-color: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 10px;
+        }
+        .container { max-width: 1350px; margin: 0 auto; }
+        header {
+            background: linear-gradient(135deg, var(--primary), #1e3a8a);
+            color: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        header h1 { margin: 0; font-size: 1.3em; }
+
+        .alert-banner {
+            background-color: #fffbeb;
+            border-left: 5px solid #f59e0b;
+            border: 1px solid #fde68a;
+            color: #92400e;
+            padding: 12px 14px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.9em;
+        }
+
+        .login-box {
+            max-width: 100%;
+            width: 100%;
+            box-sizing: border-box;
+            margin: 20px auto;
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+        }
+
+        .top-bar {
+            background: var(--card-bg);
+            padding: 12px 15px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+            font-size: 0.9em;
+        }
+        @media(min-width: 600px) {
+            .top-bar { flex-direction: row; justify-content: space-between; align-items: center; }
+            .login-box { max-width: 420px; }
+            header h1 { font-size: 1.65em; }
+            body { padding: 20px; }
+        }
+
+        button {
+            background-color: var(--secondary);
+            color: white;
+            border: none;
+            padding: 10px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.88em;
+            transition: 0.2s;
+            width: 100%;
+        }
+        @media(min-width: 600px) {
+            button { width: auto; }
+        }
+        button:hover { opacity: 0.9; }
+        .btn-admin { background-color: #1e3a8a; }
+        .btn-excel { background-color: #059669; }
+        .btn-pdf { background-color: #dc2626; }
+        .btn-danger { background-color: #dc2626; padding: 6px 12px; font-size: 0.85em; width: auto; }
+        .btn-reset { background-color: #7c3aed; }
+        .btn-page { background-color: #475569; padding: 8px 14px; font-size: 0.85em; width: auto; }
+        .btn-page:disabled { background-color: #cbd5e1; cursor: not-allowed; }
+
+        .card {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            margin-bottom: 15px;
+        }
+        .card h2 {
+            margin-top: 0;
+            color: var(--primary);
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 8px;
+            font-size: 1.1em;
+        }
+
+        .hidden { display: none !important; }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 12px;
+            margin-top: 10px;
+        }
+        @media(min-width: 768px) {
+            .form-grid { grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); }
+        }
+
+        label { font-weight: 600; font-size: 0.85em; color: #475569; display: block; margin-bottom: 4px; }
+        input, select {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            width: 100%;
+            box-sizing: border-box;
+            font-family: inherit;
+            font-size: 0.95em;
+        }
+
+        .toolbar {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        @media(min-width: 768px) {
+            .toolbar { flex-direction: row; justify-content: space-between; align-items: center; }
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.85em; white-space: nowrap; }
+        th, td { border: 1px solid #cbd5e1; padding: 8px 6px; text-align: center; }
+        th { background-color: #f8fafc; color: var(--primary); font-weight: 700; }
+        tr:hover { background-color: #f1f5f9; }
+
+        .pagination {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+
+        .badge { padding: 4px 8px; border-radius: 20px; font-size: 0.75em; font-weight: 700; }
+        .badge-lt { background-color: #dbeafe; color: #1e40af; }
+        .badge-acc { background-color: #fee2e2; color: #991b1b; }
+        .badge-due { background-color: #fef3c7; color: #b45309; border: 1px solid #f59e0b; }
+        .badge-ok { background-color: #dcfce7; color: #166534; }
+        .badge-completed { background-color: #e2e8f0; color: #334155; border: 1px solid #94a3b8; }
+
+        /* إعدادات خاصة عند الطباعة كـ PDF */
+        @media print {
+            body { background: white; padding: 0; }
+            .top-bar, .toolbar, .pagination, .admin-col, .alert-banner, #loginScreen, header { display: none !important; }
+            .card { box-shadow: none; padding: 0; margin: 0; }
+            table { font-size: 10pt; width: 100%; }
+            th, td { border: 1px solid #000; padding: 5px; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Stability Management & Pull Schedule System</h1>
+    </header>
+
+    <!-- Login Screen -->
+    <div id="loginScreen" class="login-box">
+        <h2 style="text-align:center; margin-top:0; color:#1e3a8a;">System Login</h2>
+        <div style="margin-bottom:12px;">
+            <label>Username:</label>
+            <input type="text" id="loginUser" placeholder="Enter username">
+        </div>
+        <div style="margin-bottom:16px;">
+            <label>Password:</label>
+            <input type="password" id="loginPass" placeholder="Enter password">
+        </div>
+        <button style="width:100%; padding:11px; font-size:1em;" onclick="handleLogin()">Login</button>
+        <p style="font-size:0.8em; color:#64748b; text-align:center; margin-top:14px;">
+            Default Admin: <b>admin</b> / <b>1234</b><br>
+            Default Analyst: <b>analyst</b> / <b>1234</b>
+        </p>
+    </div>
+
+    <!-- Main Application -->
+    <div id="mainApp" class="hidden">
+        <!-- Alert Banner -->
+        <div id="alertBanner" class="alert-banner">
+            <div id="alertText">Checking next month pull schedules...</div>
+            <button onclick="document.getElementById('alertBanner').style.display='none'" style="background:#b45309; padding:4px 10px; width:auto;">Close</button>
+        </div>
+
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div>
+                <strong>User:</strong> <span id="userDisplay" style="color:var(--secondary); font-weight:bold;"></span>
+                — <strong>Role:</strong> <span id="roleDisplay" style="font-weight:bold;"></span>
+            </div>
+            <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                <button id="resetBtn" class="btn-reset hidden" onclick="resetData()">🔄 Reset Data</button>
+                <button class="btn-danger" onclick="logout()">Logout</button>
+            </div>
+        </div>
+
+        <!-- Admin Section -->
+        <div id="adminSection" class="hidden">
+            <!-- 1. Sample Intake -->
+            <div class="card">
+                <h2>1. Sample Intake (Admin Only)</h2>
+                <div class="form-grid">
+                    <div>
+                        <label>Product Name:</label>
+                        <input type="text" id="prodName" placeholder="e.g. Paracetamol">
+                    </div>
+                    <div>
+                        <label>Batch Number:</label>
+                        <input type="text" id="batchNo" placeholder="e.g. 2400952">
+                    </div>
+                    <div>
+                        <label>Type of study:</label>
+                        <select id="studyType" onchange="updateDefaultPoints()">
+                            <option value="Long Term">Long Term</option>
+                            <option value="Accelerated">Accelerated</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Start Date:</label>
+                        <input type="date" id="startDate">
+                    </div>
+                    <div>
+                        <label>Time Points:</label>
+                        <input type="text" id="timePoints" value="0,3,6,9,12,18,24,36">
+                    </div>
+                </div>
+                <button style="margin-top:14px;" onclick="addSample()">+ Add Sample</button>
+            </div>
+
+            <!-- 2. User Management -->
+            <div class="card">
+                <h2>2. User Creation & Management (Admin Only)</h2>
+                <div class="form-grid">
+                    <div>
+                        <label>New Username:</label>
+                        <input type="text" id="newUsername" placeholder="e.g. mohamed">
+                    </div>
+                    <div>
+                        <label>Password:</label>
+                        <input type="text" id="newPassword" placeholder="e.g. 5566">
+                    </div>
+                    <div>
+                        <label>Role:</label>
+                        <select id="newUserRole">
+                            <option value="Analyst">Analyst (View & Export)</option>
+                            <option value="Admin">Admin (Full Control)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn-admin" style="margin-top:14px;" onclick="addUser()">+ Create New User</button>
+
+                <div style="margin-top:20px;">
+                    <h3 style="font-size:0.95em; color:#334155; margin-bottom:8px;">Registered Users List:</h3>
+                    <div class="table-responsive">
+                        <table style="max-width:700px;">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Username</th>
+                                    <th>Role</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="usersTableBody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Pull Schedule Table -->
+        <div class="card">
+            <h2>Monthly Pull Schedule</h2>
+            <div class="toolbar">
+                <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap; width:100%;">
+                    <label style="margin:0;">Filter:</label>
+                    <select id="filterSelect" onchange="currentPage=1; renderTable();" style="flex:1; min-width:140px; padding:8px;">
+                        <option value="all">All Active Batches</option>
+                        <option value="nextMonth">🔔 Next Month Pulls Only</option>
+                        <option value="Long Term">Long Term Only</option>
+                        <option value="Accelerated">Accelerated Only</option>
+                        <option value="Completed">✅ Completed Batches Only</option>
+                    </select>
+                    <input type="text" id="searchInput" onkeyup="currentPage=1; renderTable();" placeholder="Search product or batch..." style="flex:1; min-width:160px; padding:8px;">
+                </div>
+                <div style="display:flex; gap:8px; width:100%; justify-content:flex-end; flex-wrap:wrap;">
+                    <button class="btn-excel" onclick="exportOfficialExcel()">📥 Export Excel</button>
+                    <button class="btn-pdf" onclick="exportPDF()">📄 Export / Print PDF</button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Product Name</th>
+                            <th>Batch No.</th>
+                            <th>Type of study</th>
+                            <th>Start Date</th>
+                            <th>Next Interval</th>
+                            <th>Due Pull Date</th>
+                            <th>ICH Time Points</th>
+                            <th>Status</th>
+                            <th class="admin-col">Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody"></tbody>
+                </table>
+            </div>
+
+            <div class="pagination">
+                <button id="prevBtn" class="btn-page" onclick="changePage(-1)">Previous</button>
+                <span id="pageIndicator" style="font-weight:600; font-size:0.85em; color:#475569;">Page 1 of 1</span>
+                <button id="nextBtn" class="btn-page" onclick="changePage(1)">Next</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let currentUser = null;
+    let currentPage = 1;
+    const rowsPerPage = 50;
+
+    const defaultUsers = [
+        { username: "admin", password: "1234", role: "Admin" },
+        { username: "analyst", password: "1234", role: "Analyst" }
+    ];
+
+    const defaultSamples = [
+        { name: "Paracetamol", batch: "2400952", study: "Long Term", date: "2025-04-14", points: "0,3,6,9,12,18,24,36" },
+        { name: "Glucose 5%", batch: "2401169", study: "Long Term", date: "2025-05-09", points: "0,3,6,9,12,18,24,36" },
+        { name: "Glucose 5%", batch: "2600347", study: "Long Term", date: "2026-02-11", points: "0,3,6,9,12,18,24,36" },
+        { name: "Mg Sulfate 50%", batch: "2501527", study: "Long Term", date: "2025-12-22", points: "0,3,6,9,12,18,24" },
+        { name: "Mg Sulfate 50%", batch: "2501528", study: "Long Term", date: "2025-12-22", points: "0,3,6,9,12,18,24" },
+        { name: "Mg Sulfate 50%", batch: "2501526", study: "Long Term", date: "2025-12-22", points: "0,3,6,9,12,18,24" },
+        { name: "Mg Sulfate 10%", batch: "2501522", study: "Long Term", date: "2025-12-22", points: "0,3,6,9,12,18,24" },
+        { name: "Mg Sulfate 10%", batch: "2501523", study: "Long Term", date: "2025-12-22", points: "0,3,6,9,12,18,24" },
+        { name: "Kcl 15%", batch: "2502735", study: "Long Term", date: "2025-12-22", points: "0,3,6,9,12,18,24" },
+        { name: "Glucose 5%", batch: "2500787", study: "Long Term", date: "2025-07-07", points: "0,3,6,9,12,18,24,36" },
+        { name: "Glucose 10%", batch: "2501136", study: "Long Term", date: "2025-06-16", points: "0,3,6,9,12,18,24,36" },
+        { name: "Glucose 25%", batch: "2501179", study: "Long Term", date: "2025-06-12", points: "0,3,6,9,12,18,24,36" },
+        { name: "Glucose 25%", batch: "2600284", study: "Long Term", date: "2026-02-04", points: "0,3,6,9,12,18,24,36" },
+        { name: "Glucose 10%", batch: "2401957", study: "Long Term", date: "2024-07-22", points: "0,3,6,9,12,18,24,36" },
+        { name: "Glucose 25%", batch: "2401984", study: "Long Term", date: "2024-07-23", points: "0,3,6,9,12,18,24,36" },
+        { name: "Mannitol 20%", batch: "2402231", study: "Long Term", date: "2024-08-03", points: "0,3,6,9,12,18,24,36" },
+        { name: "Paracetamol", batch: "A2500672", study: "Long Term", date: "2025-05-21", points: "0,3,6,9,12,18,24,36" },
+        { name: "Paracetamol", batch: "A2500671", study: "Long Term", date: "2025-05-21", points: "0,3,6,9,12,18,24,36" },
+        { name: "Mannitol 10%", batch: "2402224", study: "Long Term", date: "2024-08-03", points: "0,3,6,9,12,18,24,36" },
+        { name: "Paracetamol", batch: "A2600306", study: "Long Term", date: "2026-02-08", points: "0,3,6,9,12,18,24" },
+        { name: "Paracetamol", batch: "A2600257", study: "Long Term", date: "2026-02-08", points: "0,3,6,9,12,18,24" },
+        { name: "Metronidazole", batch: "2502014", study: "Long Term", date: "2025-08-21", points: "0,3,6,9,12,18,24" },
+        { name: "Paracetamol", batch: "2400952", study: "Long Term", date: "2024-04-14", points: "0,3,6,9,12,18,24,36" },
+        { name: "Pentamol", batch: "2401145", study: "Long Term", date: "2024-07-02", points: "0,3,6,9,12,18,24" },
+        { name: "Pentamol", batch: "2402745", study: "Long Term", date: "2024-10-03", points: "0,3,6,9,12,18,24" },
+        { name: "Pentamol", batch: "2402746", study: "Long Term", date: "2024-10-01", points: "0,3,6,9,12,18,24" },
+        { name: "Paracetamol", batch: "2500671", study: "Long Term", date: "2025-05-21", points: "0,3,6,9,12,18,24,36" },
+        { name: "Paracetamol", batch: "2500672", study: "Long Term", date: "2025-05-21", points: "0,3,6,9,12,18,24,36" },
+        { name: "Pyritrust", batch: "2502506", study: "Long Term", date: "2025-12-11", points: "0,3,6,9,12,18,24" },
+        { name: "Cpd.Sod.lactate", batch: "2303094", study: "Long Term", date: "2023-12-23", points: "0,3,6,9,12,18,24,36" },
+        { name: "Cpd.Sod.lactate", batch: "2402408", study: "Long Term", date: "2024-11-24", points: "0,3,6,9,12,18,24,36" },
+        { name: "Cpd.Sod.lactate", batch: "2500130", study: "Long Term", date: "2025-01-20", points: "0,3,6,9,12,18,24,36" },
+        { name: "Ringer Injection", batch: "2401861", study: "Long Term", date: "2024-06-28", points: "0,3,6,9,12,18,24,36" },
+        { name: "Ringer Injection", batch: "2400376", study: "Long Term", date: "2024-02-28", points: "0,3,6,9,12,18,24,36" },
+        { name: "Ringer Injection", batch: "2500174", study: "Long Term", date: "2025-02-26", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.18% & Glucose 4.3%", batch: "2500899", study: "Long Term", date: "2025-06-17", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.9%", batch: "2500117", study: "Long Term", date: "2025-01-20", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.9%", batch: "2400162", study: "Long Term", date: "2024-01-24", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.9%", batch: "2401860", study: "Long Term", date: "2024-06-26", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.9% 250 ml", batch: "2500275", study: "Long Term", date: "2025-03-19", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 3%", batch: "2500152", study: "Long Term", date: "2025-02-26", points: "0,3,6,9,12,18,24,36" },
+        { name: "Mannitol 20%", batch: "2500780", study: "Long Term", date: "2025-04-08", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.45%", batch: "2403669", study: "Long Term", date: "2024-05-09", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.9%", batch: "2600270", study: "Long Term", date: "2026-02-04", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.9% & Glucose 5%", batch: "2500108", study: "Long Term", date: "2025-06-26", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.9% & Glucose 5%", batch: "2401302", study: "Long Term", date: "2024-05-23", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.9% & Glucose 5%", batch: "2500755", study: "Long Term", date: "2025-04-29", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.18% & Glucose 4.3%", batch: "2502214", study: "Long Term", date: "2025-09-23", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.18% & Glucose 4.3%", batch: "2502211", study: "Long Term", date: "2025-09-23", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.45% & Glucose 5%", batch: "2401259", study: "Long Term", date: "2024-06-26", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.45% & Glucose 5%", batch: "2502215", study: "Long Term", date: "2025-09-16", points: "0,3,6,9,12,18,24,36" },
+        { name: "WFI 5ml", batch: "2600066", study: "Long Term", date: "2026-02-04", points: "0,3,6,9,12,18,24,36,48" },
+        { name: "WFI 10ml", batch: "2500161", study: "Long Term", date: "2025-03-10", points: "0,3,6,9,12,18,24,36" },
+        { name: "Sodium Bicarbonate 8.4%", batch: "2402910", study: "Long Term", date: "2024-04-02", points: "0,3,6,9,12,18,24,36" },
+        { name: "CaCl2 10ML", batch: "2502731", study: "Long Term", date: "2025-12-21", points: "0,3,6,9,12,18,24,36" },
+        { name: "CaCl2 10ML", batch: "2502730", study: "Long Term", date: "2025-12-21", points: "0,3,6,9,12,18,24,36" },
+        { name: "CaCl2 10ML", batch: "2502729", study: "Long Term", date: "2025-12-21", points: "0,3,6,9,12,18,24,36" },
+        { name: "Lidocaine 2%", batch: "2501903", study: "Long Term", date: "2025-12-16", points: "0,3,6,9,12,18,24,36" },
+        { name: "Lidocaine 2%", batch: "2501904", study: "Long Term", date: "2025-12-16", points: "0,3,6,9,12,18,24,36" },
+        { name: "WFI 5ml", batch: "2500861", study: "Long Term", date: "2025-05-13", points: "0,3,6,9,12,18,24,36,48" },
+        { name: "WFI 8ML", batch: "2402989", study: "Long Term", date: "2024-10-20", points: "0,3,6,9,12,18,24,36" },
+        { name: "Lidocaine 1%", batch: "2500471", study: "Long Term", date: "2025-06-17", points: "0,3,6,9,12,18,24,36" },
+        { name: "Sodium Bicarbonate 8.4%", batch: "2402909", study: "Long Term", date: "2024-10-20", points: "0,3,6,9,12,18,24,36" },
+        { name: "Mannitol 10%", batch: "2600368", study: "Long Term", date: "2026-02-19", points: "0,3,6,9,12,18,24,36" },
+        { name: "Mannitol 20%", batch: "2600372", study: "Long Term", date: "2026-02-19", points: "0,3,6,9,12,18,24,36" },
+        { name: "Ringer Injection", batch: "2600531", study: "Long Term", date: "2026-02-26", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.18% & Glucose 4.3%", batch: "2600623", study: "Long Term", date: "2026-03-04", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.45% & Glucose 5%", batch: "2600628", study: "Long Term", date: "2026-03-04", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.9% & Glucose 5%", batch: "2600655", study: "Long Term", date: "2026-03-08", points: "0,3,6,9,12,18,24,36" },
+        { name: "Nacl 0.9% 110 ml", batch: "2500560", study: "Long Term", date: "2025-04-13", points: "0,3,6,9,12,18,24" },
+        { name: "Pentamol", batch: "2601017", study: "Long Term", date: "2026-04-19", points: "0,3,6,9,12,18,24,36" },
+        { name: "Calcium gluconate", batch: "2502539", study: "Long Term", date: "2025-05-18", points: "0,3,6,9,12,18,24,36" },
+        { name: "Calcium gluconate", batch: "2502540", study: "Long Term", date: "2025-05-18", points: "0,3,6,9,12,18,24,36" },
+        { name: "Calcium gluconate", batch: "2502541", study: "Long Term", date: "2025-05-18", points: "0,3,6,9,12,18,24,36" },
+        { name: "Lidocaine 2%", batch: "2601988", study: "Long Term", date: "2026-08-10", points: "0,3,6,9,12,18,24,36" },
+        { name: "Lidocaine 1%", batch: "2601989", study: "Long Term", date: "2026-08-20", points: "0,3,6,9,12,18,24,36" },
+        { name: "Lidocaine 1%", batch: "2601990", study: "Long Term", date: "2026-08-20", points: "0,3,6,9,12,18,24,36" },
+        { name: "Metronidazole", batch: "2602217", study: "Long Term", date: "2026-08-23", points: "0,3,6,9,12,18,24,36" },
+        { name: "Glucose 25%", batch: "2601021", study: "Accelerated", date: "2026-04-26", points: "0,1,3,6" },
+        { name: "Pentamol", batch: "2601017", study: "Accelerated", date: "2026-04-19", points: "0,1,3,6" },
+        { name: "Calcium gluconate", batch: "2502539", study: "Accelerated", date: "2025-05-18", points: "0,1,3,6" },
+        { name: "Calcium gluconate", batch: "2502540", study: "Accelerated", date: "2025-05-18", points: "0,1,3,6" },
+        { name: "Calcium gluconate", batch: "2502541", study: "Accelerated", date: "2025-05-18", points: "0,1,3,6" },
+        { name: "compound sodium lactate", batch: "2601768", study: "Accelerated", date: "2026-06-25", points: "0,1,3,6" },
+        { name: "Lidocaine 2%", batch: "2601986", study: "Accelerated", date: "2026-08-10", points: "0,1,3,6" },
+        { name: "Lidocaine 1%", batch: "2601989", study: "Accelerated", date: "2026-08-20", points: "0,1,3,6" },
+        { name: "Lidocaine 1%", batch: "2601990", study: "Accelerated", date: "2026-08-20", points: "0,1,3,6" },
+        { name: "Metronidazole", batch: "2602217", study: "Accelerated", date: "2026-08-23", points: "0,1,3,6" },
+        { name: "Metronidazole", batch: "24183001", study: "Long Term", date: "2024-02-26", points: "0,3,6,9,12,18,24" },
+        { name: "Metronidazole", batch: "24183002", study: "Long Term", date: "2024-02-26", points: "0,3,6,9,12,18,24" },
+        { name: "Pyritrust", batch: "43242077", study: "Long Term", date: "2024-01-26", points: "0,3,6,9,12,18,24,36" },
+        { name: "Metronidazole", batch: "43250372", study: "Long Term", date: "2025-04-07", points: "0,3,6,9,12,18,24" },
+        { name: "Metronidazole", batch: "43250373", study: "Long Term", date: "2025-04-07", points: "0,3,6,9,12,18,24" },
+        { name: "Metronidazole", batch: "43250374", study: "Long Term", date: "2025-04-07", points: "0,3,6,9,12,18,24" },
+        { name: "Ringer Injection", batch: "2602687", study: "Long Term", date: "2026-10-18", points: "0,3,6,9,12,18,24,36" },
+        { name: "Ringer Injection", batch: "2602687", study: "Accelerated", date: "2026-10-18", points: "0,1,3,6" }
+    ];
+
+    let users = JSON.parse(localStorage.getItem('stab_users_en_v13')) || defaultUsers;
+    let samples = JSON.parse(localStorage.getItem('stab_samples_en_v13')) || defaultSamples;
+
+    function formatDateDMY(dateStr) {
+        if (!dateStr || dateStr === '-') return '-';
+        const parts = dateStr.split('-');
+        if (parts.length === 3) {
+            return parts[2] + '-' + parts[1] + '-' + parts[0];
+        }
+        return dateStr;
+    }
+
+    function handleLogin() {
+        const u = document.getElementById('loginUser').value.trim().toLowerCase();
+        const p = document.getElementById('loginPass').value.trim();
+
+        const found = users.find(acc => acc.username.toLowerCase() === u && acc.password === p);
+        if (!found) {
+            alert('Invalid username or password!');
+            return;
+        }
+
+        currentUser = found;
+        document.getElementById('loginScreen').classList.add('hidden');
+        document.getElementById('mainApp').classList.remove('hidden');
+        document.getElementById('userDisplay').innerText = found.username;
+        document.getElementById('roleDisplay').innerText = found.role;
+
+        if (found.role === 'Admin') {
+            document.getElementById('adminSection').classList.remove('hidden');
+            document.getElementById('resetBtn').classList.remove('hidden');
+            renderUsersTable();
+        } else {
+            document.getElementById('adminSection').classList.add('hidden');
+            document.getElementById('resetBtn').classList.add('hidden');
+        }
+
+        renderTable();
+        updateAlertBanner();
+    }
+
+    function logout() {
+        currentUser = null;
+        document.getElementById('mainApp').classList.add('hidden');
+        document.getElementById('adminSection').classList.add('hidden');
+        document.getElementById('loginScreen').classList.remove('hidden');
+        document.getElementById('loginUser').value = '';
+        document.getElementById('loginPass').value = '';
+    }
+
+    function updateDefaultPoints() {
+        const st = document.getElementById('studyType').value;
+        document.getElementById('timePoints').value = (st === 'Long Term') ? "0,3,6,9,12,18,24,36" : "0,1,3,6";
+    }
+
+    function addUser() {
+        if (!currentUser || currentUser.role !== 'Admin') {
+            alert('Access Denied! Only Admin can create users.');
+            return;
+        }
+
+        const u = document.getElementById('newUsername').value.trim();
+        const p = document.getElementById('newPassword').value.trim();
+        const r = document.getElementById('newUserRole').value;
+
+        if (!u || !p) {
+            alert('Please enter username and password.');
+            return;
+        }
+        if (users.some(acc => acc.username.toLowerCase() === u.toLowerCase())) {
+            alert('Username already exists!');
+            return;
+        }
+
+        users.push({ username: u, password: p, role: r });
+        localStorage.setItem('stab_users_en_v13', JSON.stringify(users));
+        document.getElementById('newUsername').value = '';
+        document.getElementById('newPassword').value = '';
+        renderUsersTable();
+        alert('User (' + u + ') created successfully with role ' + r + '!');
+    }
+
+    function deleteUser(index) {
+        if (!currentUser || currentUser.role !== 'Admin') return;
+        const targetUser = users[index].username.toLowerCase();
+        if (targetUser === 'admin' || targetUser === 'analyst') {
+            alert('Cannot delete default system accounts (admin / analyst)!');
+            return;
+        }
+        if (confirm('Are you sure you want to delete this user?')) {
+            users.splice(index, 1);
+            localStorage.setItem('stab_users_en_v13', JSON.stringify(users));
+            renderUsersTable();
+        }
+    }
+
+    function renderUsersTable() {
+        if (!currentUser || currentUser.role !== 'Admin') return;
+        const tbody = document.getElementById('usersTableBody');
+        tbody.innerHTML = '';
+        users.forEach((u, idx) => {
+            const unameLower = u.username.toLowerCase();
+            const delBtn = (unameLower === 'admin' || unameLower === 'analyst')
+                ? '<span style="color:#94a3b8; font-size:0.85em;">Primary</span>'
+                : '<button class="btn-danger" onclick="deleteUser(' + idx + ')">Delete</button>';
+            tbody.innerHTML += '<tr>' +
+                '<td>' + (idx + 1) + '</td>' +
+                '<td><strong>' + u.username + '</strong></td>' +
+                '<td>' + u.role + '</td>' +
+                '<td>' + delBtn + '</td>' +
+                '</tr>';
+        });
+    }
+
+    function resetData() {
+        if (!currentUser || currentUser.role !== 'Admin') return;
+        if (confirm('Are you sure you want to restore default sheet samples?')) {
+            samples = JSON.parse(JSON.stringify(defaultSamples));
+            localStorage.setItem('stab_samples_en_v13', JSON.stringify(samples));
+            currentPage = 1;
+            renderTable();
+            updateAlertBanner();
+            alert('Data restored successfully!');
+        }
+    }
+
+    function calculateNextPull(startDateStr, pointsStr) {
+        if (!startDateStr || !pointsStr) return { point: "N/A", dateStr: "-", isNextMonth: false };
+        const parts = startDateStr.split('-');
+        const start = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+        if (isNaN(start.getTime())) return { point: "Invalid", dateStr: "-", isNextMonth: false };
+
+        const today = new Date();
+        const currentMonthStart = new Date(today.getFullYear(), today.getMonth(), 1);
+        const nextMonthStart = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+        const nextMonthEnd = new Date(today.getFullYear(), today.getMonth() + 2, 0);
+
+        const points = pointsStr.split(',').map(p => parseInt(p.trim())).filter(p => !isNaN(p) && p > 0);
+
+        for (let months of points) {
+            let pullDate = new Date(start.getFullYear(), start.getMonth() + months, start.getDate());
+            if (pullDate >= currentMonthStart) {
+                const isNextMonth = (pullDate >= nextMonthStart && pullDate <= nextMonthEnd);
+                const yyyy = pullDate.getFullYear();
+                const mm = String(pullDate.getMonth() + 1).padStart(2, '0');
+                const dd = String(pullDate.getDate()).padStart(2, '0');
+                return {
+                    point: months + "M",
+                    dateStr: yyyy + "-" + mm + "-" + dd,
+                    isNextMonth: isNextMonth
+                };
+            }
+        }
+        return { point: "Completed", dateStr: "-", isNextMonth: false };
+    }
+
+    function addSample() {
+        if (!currentUser || currentUser.role !== 'Admin') {
+            alert('Unauthorized action!');
+            return;
+        }
+        const name = document.getElementById('prodName').value.trim();
+        const batch = document.getElementById('batchNo').value.trim();
+        const study = document.getElementById('studyType').value;
+        const date = document.getElementById('startDate').value;
+        const points = document.getElementById('timePoints').value.trim();
+
+        if (!name || !batch || !date) {
+            alert('Please fill in product name, batch number, and start date.');
+            return;
+        }
+
+        samples.unshift({ name, batch, study, date, points });
+        localStorage.setItem('stab_samples_en_v13', JSON.stringify(samples));
+
+        document.getElementById('prodName').value = '';
+        document.getElementById('batchNo').value = '';
+        currentPage = 1;
+        renderTable();
+        updateAlertBanner();
+        alert('Sample added successfully!');
+    }
+
+    function deleteSample(index) {
+        if (!currentUser || currentUser.role !== 'Admin') return;
+        if (confirm('Are you sure you want to delete this sample?')) {
+            samples.splice(index, 1);
+            localStorage.setItem('stab_samples_en_v13', JSON.stringify(samples));
+            renderTable();
+            updateAlertBanner();
+        }
+    }
+
+    function changePage(direction) {
+        currentPage += direction;
+        renderTable();
+    }
+
+    function renderTable() {
+        const tbody = document.getElementById('tableBody');
+        const filter = document.getElementById('filterSelect').value;
+        const search = document.getElementById('searchInput').value.toLowerCase();
+        tbody.innerHTML = '';
+
+        const isAdmin = (currentUser && currentUser.role === 'Admin');
+        document.querySelectorAll('.admin-col').forEach(el => {
+            el.style.display = isAdmin ? '' : 'none';
+        });
+
+        let filteredSamples = samples.filter((s) => {
+            const pullInfo = calculateNextPull(s.date, s.points);
+            const isCompleted = (pullInfo.point === 'Completed');
+
+            if (filter === 'Completed' && !isCompleted) return false;
+            if (filter === 'all' && isCompleted) return false;
+            if (filter === 'nextMonth' && !pullInfo.isNextMonth) return false;
+            if (filter === 'Long Term' && (s.study !== 'Long Term' || isCompleted)) return false;
+            if (filter === 'Accelerated' && (s.study !== 'Accelerated' || isCompleted)) return false;
+            if (search && !s.name.toLowerCase().includes(search) && !s.batch.toLowerCase().includes(search)) return false;
+            return true;
+        });
+
+        const totalPages = Math.ceil(filteredSamples.length / rowsPerPage) || 1;
+        if (currentPage > totalPages) currentPage = totalPages;
+        if (currentPage < 1) currentPage = 1;
+
+        const startIdx = (currentPage - 1) * rowsPerPage;
+        const endIdx = startIdx + rowsPerPage;
+        const paginatedSamples = filteredSamples.slice(startIdx, endIdx);
+
+        paginatedSamples.forEach((s, idx) => {
+            const actualIndex = samples.indexOf(s);
+            const pullInfo = calculateNextPull(s.date, s.points);
+            const isCompleted = (pullInfo.point === 'Completed');
+
+            let statusBadge = '';
+            if (isCompleted) {
+                statusBadge = '<span class="badge badge-completed">✅ Completed</span>';
+            } else if (pullInfo.isNextMonth) {
+                statusBadge = '<span class="badge badge-due">🔔 Due Next Month</span>';
+            } else {
+                statusBadge = '<span class="badge badge-ok">Active</span>';
+            }
+
+            const studyBadge = s.study === 'Long Term'
+                ? '<span class="badge badge-lt">Long Term</span>'
+                : '<span class="badge badge-acc">Accelerated</span>';
+
+            const adminCell = isAdmin
+                ? '<td><button class="btn-danger" onclick="deleteSample(' + actualIndex + ')">Delete</button></td>'
+                : '';
+
+            const formattedStartDate = formatDateDMY(s.date);
+            const formattedDueDate = formatDateDMY(pullInfo.dateStr);
+
+            tbody.innerHTML += '<tr>' +
+                '<td>' + (startIdx + idx + 1) + '</td>' +
+                '<td style="text-align:left; font-weight:600;">' + s.name + '</td>' +
+                '<td><strong>' + s.batch + '</strong></td>' +
+                '<td>' + studyBadge + '</td>' +
+                '<td>' + formattedStartDate + '</td>' +
+                '<td><strong>' + pullInfo.point + '</strong></td>' +
+                '<td style="font-weight:600;">' + formattedDueDate + '</td>' +
+                '<td style="font-size:0.82em; color:#64748b;">' + s.points + '</td>' +
+                '<td>' + statusBadge + '</td>' +
+                adminCell +
+                '</tr>';
+        });
+
+        document.getElementById('pageIndicator').innerText = 'Page ' + currentPage + ' of ' + totalPages + ' (Total: ' + filteredSamples.length + ' batches)';
+        document.getElementById('prevBtn').disabled = (currentPage === 1);
+        document.getElementById('nextBtn').disabled = (currentPage === totalPages || totalPages === 0);
+    }
+
+    function updateAlertBanner() {
+        const today = new Date();
+        const nextMonth = new Date(today.getFullYear(), today.getMonth() + 1, 1);
+        const monthName = nextMonth.toLocaleString('en-US', { month: 'long', year: 'numeric' });
+        const dueSamples = samples.filter(s => calculateNextPull(s.date, s.points).isNextMonth);
+        const alertText = document.getElementById('alertText');
+
+        if (dueSamples.length > 0) {
+            alertText.innerHTML = '🔔 <strong>Next Month Alert (' + monthName + '):</strong> Total <strong>(' + dueSamples.length + ')</strong> batches are due for pulling.';
+        } else {
+            alertText.innerHTML = '✅ <strong>Update (' + monthName + '):</strong> No batches due for pulling next month.';
+        }
+    }
+
+    // دالة تصدير ملف الإكسيل الرسمي
+    function exportOfficialExcel() {
+        const today = new Date();
+        const printDate = formatDateDMY(today.toISOString().split('T')[0]);
+        const filter = document.getElementById('filterSelect').value;
+
+        let rowsHTML = '';
+        let seq = 1;
+
+        samples.forEach(s => {
+            const pullInfo = calculateNextPull(s.date, s.points);
+            const isCompleted = (pullInfo.point === 'Completed');
+
+            if (filter === 'Completed' && !isCompleted) return;
+            if (filter === 'all' && isCompleted) return;
+            if (filter === 'nextMonth' && !pullInfo.isNextMonth) return;
+            if (filter === 'Long Term' && (s.study !== 'Long Term' || isCompleted)) return;
+            if (filter === 'Accelerated' && (s.study !== 'Accelerated' || isCompleted)) return;
+
+            const rowBg = isCompleted ? '#F1F5F9' : (pullInfo.isNextMonth ? '#FFFBEB' : '#FFFFFF');
+            const formattedStartDate = formatDateDMY(s.date);
+            const formattedDueDate = formatDateDMY(pullInfo.dateStr);
+
+            rowsHTML += '<tr style="background-color:' + rowBg + ';">' +
+                '<td style="border:1px solid #334155; padding:7px; text-align:center;">' + (seq++) + '</td>' +
+                '<td style="border:1px solid #334155; padding:7px; font-weight:bold; text-align:left; mso-number-format:\@;">' + s.name + '</td>' +
+                '<td style="border:1px solid #334155; padding:7px; text-align:center; font-weight:bold; mso-number-format:\@;">' + s.batch + '</td>' +
+                '<td style="border:1px solid #334155; padding:7px; text-align:center; mso-number-format:\@;">' + s.study + '</td>' +
+                '<td style="border:1px solid #334155; padding:7px; text-align:center; mso-number-format:\@;">' + formattedStartDate + '</td>' +
+                '<td style="border:1px solid #334155; padding:7px; text-align:center; font-weight:bold; color:#1E3A8A; mso-number-format:\@;">' + pullInfo.point + '</td>' +
+                '<td style="border:1px solid #334155; padding:7px; text-align:center; font-weight:bold; mso-number-format:\@;">' + formattedDueDate + '</td>' +
+                '<td style="border:1px solid #334155; padding:7px; text-align:center;"></td>' +
+                '<td style="border:1px solid #334155; padding:7px; text-align:center;"></td>' +
+                '</tr>';
+        });
+
+        const docOpen = '<' + 'html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40">' +
+                        '<' + 'head><meta charset="UTF-8">' +
+                        '<' + 'xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>Pull Schedule</x:Name><x:WorksheetOptions><x:DisplayGridlines/><x:DisplayRightToLeft>False</x:DisplayRightToLeft></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml>' +
+                        '<' + 'style>body{font-family:Arial; direction:ltr; text-align:left;}</style><' + '/head>' +
+                        '<' + 'body dir="ltr">';
+        const docClose = '<' + '/body><' + '/html>';
+
+        const tableContent = '<table dir="ltr">' +
+            '<tr><td colspan="9" style="background-color:#1E3A8A; color:#FFFFFF; font-size:14pt; font-weight:bold; text-align:center; padding:10px;">QUALITY CONTROL DEPARTMENT — STABILITY SAMPLE PULL SCHEDULE</td></tr>' +
+            '<tr><td colspan="5" style="background-color:#F1F5F9; font-weight:bold; padding:7px; border:1px solid #334155; text-align:left;">Filter: ' + filter.toUpperCase() + '</td>' +
+            '<td colspan="4" style="background-color:#F1F5F9; font-weight:bold; padding:7px; border:1px solid #334155; text-align:right;">Issue Date: ' + printDate + ' | ICH Q1A</td></tr>' +
+            '<tr><td colspan="9" style="height:10px;"></td></tr>' +
+            '<tr style="background-color:#CBD5E1; font-weight:bold; text-align:center;">' +
+            '<th style="border:1px solid #334155; padding:8px;">S.No</th>' +
+            '<th style="border:1px solid #334155; padding:8px; text-align:left;">Product Name</th>' +
+            '<th style="border:1px solid #334155; padding:8px;">Batch No.</th>' +
+            '<th style="border:1px solid #334155; padding:8px;">Type of study</th>' +
+            '<th style="border:1px solid #334155; padding:8px;">Start Date</th>' +
+            '<th style="border:1px solid #334155; padding:8px;">Interval</th>' +
+            '<th style="border:1px solid #334155; padding:8px;">Due Pull Date</th>' +
+            '<th style="border:1px solid #334155; padding:8px;">Actual Pull Date</th>' +
+            '<th style="border:1px solid #334155; padding:8px;">Pulled By (Sign)</th>' +
+            '</tr>' + rowsHTML +
+            '<tr><td colspan="9" style="height:20px;"></td></tr>' +
+            '<tr>' +
+            '<td colspan="3" style="background-color:#F8FAFC; border:1px solid #334155; font-weight:bold; text-align:center; padding:8px;">Prepared By (Stability Analyst)</td>' +
+            '<td colspan="3" style="background-color:#F8FAFC; border:1px solid #334155; font-weight:bold; text-align:center; padding:8px;">Reviewed By (QC Supervisor)</td>' +
+            '<td colspan="3" style="background-color:#F8FAFC; border:1px solid #334155; font-weight:bold; text-align:center; padding:8px;">Approved By (QC Manager)</td>' +
+            '</tr>' +
+            '<tr>' +
+            '<td colspan="3" style="height:45px; border:1px solid #334155; padding:8px; vertical-align:bottom; text-align:left;">Name / Sign: _________________<br>Date: ____/____/2026</td>' +
+            '<td colspan="3" style="height:45px; border:1px solid #334155; padding:8px; vertical-align:bottom; text-align:left;">Name / Sign: _________________<br>Date: ____/____/2026</td>' +
+            '<td colspan="3" style="height:45px; border:1px solid #334155; padding:8px; vertical-align:bottom; text-align:left;">Name / Sign: _________________<br>Date: ____/____/2026</td>' +
+            '</tr></table>';
+
+        const fullExcel = docOpen + tableContent + docClose;
+        const blob = new Blob(['\ufeff', fullExcel], { type: 'application/vnd.ms-excel;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = 'Stability_Pull_Schedule_' + printDate + '.xls';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+
+    // دالة التصدير والطباعة بصيغة PDF مباشرة من المتصفح
+    function exportPDF() {
+        window.print();
+    }
+</script>
+
+</body>
+</html>
